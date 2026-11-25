@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilmRecension</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <h1>FilmRecension</h1>
+
+        <nav>
+            <a href="#home">Hem</a>
+            <a href="#movies">Filmer</a>
+            <a href="#about">Om oss</a>
+            <button id="loginBtn" type="button">Logga in</button>
+            <button id="registerBtn" type="button">Registrera</button>
+
+            <div id="userMenu" hidden>
+                <span id="userEmail"></span>
+                <button id="watchlistBtn" type="button">Min watchlist</button>
+                <button id="logoutBtn" type="button">Logga ut</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- STARTSIDA -->
+        <section class="hero" id="home">
+            <h2>Upptäck din nästa favoritfilm</h2>
+            <p>Hitta filmer, läs om dem och dela dina favoriter.</p>
+            <button id="exploreBtn" type="button">Utforska filmer</button>
+        </section>
+
+        <!-- FILMER -->
+        <section class="movies" id="movies">
+            <h2>Populära filmer</h2>
+
+            <div class="movie-controls">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Sök efter en film..."
+                >
+
+                <select id="genreFilter">
+                    <option value="">Alla genrer</option>
+                    <option value="Action">Action</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Sci-Fi">Sci-Fi</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Romance">Romance</option>
+                    <option value="Crime">Crime</option>
+                    <option value="Thriller">Thriller</option>
+                </select>
+            </div>
+
+            <div id="movie-list" class="movie-list">
+                <p>Filmerna laddas...</p>
+            </div>
+        </section>
+
+        <!-- WATCHLIST -->
+        <section id="watchlist-section" class="movies" hidden>
+            <h2>Min watchlist</h2>
+            <div id="watchlist-list" class="movie-list"></div>
+        </section>
+
+        <!-- OM OSS -->
+        <section id="about" class="movies">
+            <h2>Om FilmRecension</h2>
+            <p>
+                FilmRecension är en plattform för filmälskare.
+                Här kan du upptäcka filmer, läsa och skriva recensioner,
+                betygsätta filmer och skapa din egen watchlist.
+            </p>
+        </section>
+
+    </main>
+
+    <!-- INLOGGNING -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" data-close="loginModal" type="button">×</button>
+
+            <h2>Logga in</h2>
+
+            <form id="loginForm">
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="E-postadress"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Lösenord"
+                    required
+                >
+
+                <button type="submit">Logga in</button>
+                <p id="loginMessage"></p>
+            </form>
+
+            <p>
+                Har du inget konto?
+                <button id="openRegister" type="button">Registrera dig</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- REGISTRERING -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" data-close="registerModal" type="button">×</button>
+
+            <h2>Skapa konto</h2>
+
+            <form id="registerForm">
+                <input
+                    type="email"
+                    id="registerEmail"
+                    placeholder="E-postadress"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="registerPassword"
+                    placeholder="Lösenord (minst 8 tecken)"
+                    minlength="8"
+                    required
+                >
+
+                <button type="submit">Registrera</button>
+                <p id="registerMessage"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- FILMDETALJER -->
+    <div id="movie-modal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" data-close="movie-modal" type="button">×</button>
+
+            <h2 class="modal-title"></h2>
+
+            <p>Genre: <span class="modal-genre"></span></p>
+            <p>Utgivningsår: <span class="modal-year"></span></p>
+
+            <h3>Recensioner</h3>
+            <div id="reviews-list"></div>
+
+            <form id="reviewForm">
+                <label for="reviewRating">Betyg (1–10)</label>
+                <input
+                    type="number"
+                    id="reviewRating"
+                    min="1"
+                    max="10"
+                    required
+                >
+
+                <label for="reviewComment">Din recension</label>
+                <textarea
+                    id="reviewComment"
+                    placeholder="Skriv din recension..."
+                    required
+                ></textarea>
+
+                <button type="submit">Skicka recension</button>
+                <p id="reviewMessage"></p>
+            </form>
+
+            <button id="addToWatchlistBtn" type="button">
+                Lägg till i watchlist
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
