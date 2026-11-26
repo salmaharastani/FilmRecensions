@@ -61,7 +61,9 @@ The database uses primary keys and foreign keys to connect users, movies, review
 Each user can write one review per movie.
 The `created_at` column automatically stores the date and time when a review is created. This value is set by the database.
 
-See `database/ER-diagram.png` for the database diagram.
+## ER Diagram
+
+![FilmRecension ER Diagram](database/ER-diagram.png)
 
 ## Installation and Setup
 
