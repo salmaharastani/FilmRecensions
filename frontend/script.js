@@ -355,17 +355,28 @@ async function loadReviews(movieId) {
         }
 
         reviews.forEach(review => {
-            const reviewDiv = document.createElement('div');
-            reviewDiv.className = 'review-item';
+    const reviewDiv = document.createElement('div');
+    reviewDiv.className = 'review-item';
 
-            const rating = document.createElement('p');
-            rating.textContent = `Betyg: ${review.rating}/10`;
+    const rating = document.createElement('p');
+    rating.textContent = `Betyg: ${review.rating}/10`;
 
-            const comment = document.createElement('p');
-            comment.textContent = review.comment;
+    const comment = document.createElement('p');
+    comment.textContent = review.comment;
 
-            reviewDiv.appendChild(rating);
-            reviewDiv.appendChild(comment);
+    const date = document.createElement('p');
+
+    if (review.created_at) {
+        const reviewDate = new Date(
+            review.created_at.replace(' ', 'T')
+        );
+
+        date.textContent = `Skapad: ${reviewDate.toLocaleString('sv-SE')}`;
+    }
+
+    reviewDiv.appendChild(rating);
+    reviewDiv.appendChild(comment);
+    reviewDiv.appendChild(date);
 
             const user = getCurrentUser();
 

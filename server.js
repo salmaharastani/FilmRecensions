@@ -33,7 +33,7 @@ function authenticateToken(req, res, next) {
     });
 }
 
-// Anslut till MySQL
+// Connect to MySQL
 const db = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -41,7 +41,7 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
-// Kontrollera anslutningen
+// Check the database connection
 db.connect((err) => {
     if (err) {
         console.error('MySQL connection failed:', err);
@@ -50,7 +50,7 @@ db.connect((err) => {
     console.log('Connected to MySQL!');
 });
 
-// Hämta filmer
+// Get all movies
 app.get('/api/movies', (req, res) => {
     db.query('SELECT * FROM movies', (err, results) => {
         if (err) {
@@ -74,7 +74,8 @@ app.get('/api/movies', (req, res) => {
 res.json(movies);
     });
 });
-// Hämta en enskild film
+
+// Get a single movie
 app.get('/api/movies/:id', (req, res) => {
     const { id } = req.params;
 
@@ -102,7 +103,7 @@ app.get('/api/movies/:id', (req, res) => {
         res.status(200).json(results[0]);
     });
 });
-// Lägg till en ny film
+	// Add a new movie
 app.post('/api/movies', authenticateToken, (req, res) => {
     const { title, genre, release_year } = req.body;
     if (
@@ -139,19 +140,19 @@ return res.status(500).json({
         });
     });
 });
-// Uppdatera en film
+// Update a movie
 app.put('/api/movies/:id', authenticateToken, (req, res) => {
     const { title, genre, release_year } = req.body;
     const { id } = req.params;
 
-    // Kontrollera filmens ID
+   	// Validate the movie ID
     if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
         return res.status(400).json({
             message: 'Invalid movie ID'
         });
     }
 
-    // Kontrollera titel och genre
+	// Validate title and genre
    if (
     typeof title !== 'string' ||
     typeof genre !== 'string' ||
@@ -164,7 +165,7 @@ app.put('/api/movies/:id', authenticateToken, (req, res) => {
 }
     
 
-    // Kontrollera utgivningsår
+   	// Validate release year
     if (
     release_year === undefined ||
     release_year === null ||
@@ -203,11 +204,11 @@ app.put('/api/movies/:id', authenticateToken, (req, res) => {
     });
 });
 
-// Ta bort en film
+	// Delete a movie
 app.delete('/api/movies/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
 
-    // Kontrollera filmens ID
+    // Validate the movie ID
     if (!Number.isInteger(Number(id)) || Number(id) <= 0) {
         return res.status(400).json({
             message: 'Invalid movie ID'
@@ -236,7 +237,7 @@ app.delete('/api/movies/:id', authenticateToken, (req, res) => {
         });
     });
 });
-// Registrera en ny användare
+	// Register a new user
 app.post('/api/auth/register', async (req, res) => {
     const { email, password } = req.body;
 
@@ -299,7 +300,7 @@ app.post('/api/auth/register', async (req, res) => {
         });
     }
 });
-// Logga in användare
+	// Log in a user
 app.post('/api/auth/login', (req, res) => {
     const { email, password } = req.body;
 
@@ -367,7 +368,7 @@ app.post('/api/auth/login', (req, res) => {
         }
     });
 });
-// Hämta recensioner för en film
+// Get reviews for a movie
 app.get('/api/movies/:movieId/reviews', (req, res) => {
     const { movieId } = req.params;
 
@@ -377,13 +378,13 @@ app.get('/api/movies/:movieId/reviews', (req, res) => {
         });
     }
 
-    const sql = `
-        SELECT reviews.id, reviews.rating, reviews.comment,
-               reviews.user_id, users.email
-        FROM reviews
-        JOIN users ON reviews.user_id = users.id
-        WHERE reviews.movie_id = ?
-    `;
+   const sql = `
+    SELECT reviews.id, reviews.rating, reviews.comment,
+           reviews.user_id, reviews.created_at, users.email
+    FROM reviews
+    JOIN users ON reviews.user_id = users.id
+    WHERE reviews.movie_id = ?
+`;
 
     db.query(sql, [movieId], (err, results) => {
         if (err) {
@@ -393,13 +394,14 @@ app.get('/api/movies/:movieId/reviews', (req, res) => {
         }
 
        const reviews = results.map(review => {
-    const reviewObject = new Review(
-        review.id,
-        review.user_id,
-        Number(req.params.movieId),
-        review.rating,
-        review.comment
-    );
+   const reviewObject = new Review(
+    review.id,
+    review.user_id,
+    Number(req.params.movieId),
+    review.rating,
+    review.comment,
+    review.created_at
+);
 
     return reviewObject.getInfo();
 });
@@ -407,20 +409,20 @@ app.get('/api/movies/:movieId/reviews', (req, res) => {
 res.status(200).json(reviews);
     });
 });
-// Skapa en recension för en film
+// Create a review for a movie
 app.post('/api/movies/:movieId/reviews', authenticateToken, (req, res) => {
     const { movieId } = req.params;
     const { rating, comment } = req.body;
     const userId = req.user.id;
 
-    // Kontrollera filmens ID
+    // Validate the movie ID
     if (!Number.isInteger(Number(movieId)) || Number(movieId) <= 0) {
         return res.status(400).json({
             message: 'Invalid movie ID'
         });
     }
 
-    // Kontrollera betyg och kommentar
+    // Validate rating and comment
     if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
         return res.status(400).json({
             message: 'Rating must be an integer between 1 and 10'
@@ -433,7 +435,7 @@ app.post('/api/movies/:movieId/reviews', authenticateToken, (req, res) => {
         });
     }
 
-    // Kontrollera att filmen finns
+    // Validate that the movie exists
     db.query(
         'SELECT id FROM movies WHERE id = ?',
         [movieId],
@@ -450,7 +452,7 @@ app.post('/api/movies/:movieId/reviews', authenticateToken, (req, res) => {
                 });
             }
 
-            // Spara recensionen
+           // Save the review
             const sql = `
                 INSERT INTO reviews (user_id, movie_id, rating, comment)
                 VALUES (?, ?, ?, ?)
@@ -482,7 +484,7 @@ app.post('/api/movies/:movieId/reviews', authenticateToken, (req, res) => {
     );
 });
 
-// Uppdatera en egen recension
+// Update a user's own review
 app.put('/api/reviews/:id', authenticateToken, (req, res) => {
     const { id } = req.params;
     const { rating, comment } = req.body;
@@ -531,7 +533,7 @@ app.put('/api/reviews/:id', authenticateToken, (req, res) => {
     });
 });
 
-// Hämta den inloggade användarens watchlist
+// Get the logged-in user's watchlist
 app.get('/api/watchlist', authenticateToken, (req, res) => {
     const userId = req.user.id;
 
@@ -552,7 +554,7 @@ app.get('/api/watchlist', authenticateToken, (req, res) => {
         res.status(200).json(results);
     });
 });
-// Lägg till en film i användarens watchlist
+// Add a movie to the user's watchlist
 app.post('/api/watchlist/:movieId', authenticateToken, (req, res) => {
     const { movieId } = req.params;
     const userId = req.user.id;
@@ -592,7 +594,7 @@ app.post('/api/watchlist/:movieId', authenticateToken, (req, res) => {
         });
     });
 });
-// Ta bort en film från användarens watchlist
+// Remove a movie from the user's watchlist
 app.delete('/api/watchlist/:movieId', authenticateToken, (req, res) => {
     const { movieId } = req.params;
     const userId = req.user.id;
